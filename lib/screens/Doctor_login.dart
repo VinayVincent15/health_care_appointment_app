@@ -1,8 +1,9 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-
 import '../constrants.dart';
+import '../models/Doctor_model.dart';
 
 class Doctor_login extends StatefulWidget {
 
@@ -13,6 +14,7 @@ class Doctor_login extends StatefulWidget {
 }
 
 class _DLogin_PageState extends State<Doctor_login> {
+  final _auth=FirebaseAuth.instance;
   bool _passwordVisible=false;
   String email="";
   String password="";
@@ -21,18 +23,18 @@ class _DLogin_PageState extends State<Doctor_login> {
   bool isChecked=false;
   List doctorProfile=[];
 
-  // Future<List> getDonor(String em)async{
-  //   dynamic resultant=await DonorModel().getDoner(em);
-  //   if(resultant==null){
-  //     print("unable to retrieve");
-  //   }
-  //   else{
-  //     setState((){
-  //       donerProfile=resultant;
-  //     });
-  //   }
-  //   return donerProfile;
-  // }
+  Future<List> getDoctor(String em)async{
+    dynamic resultant=await DoctorModel().getDoctor(em);
+    if(resultant==null){
+      print("unable to retrieve");
+    }
+    else{
+      setState((){
+        doctorProfile=resultant;
+      });
+    }
+    return doctorProfile;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,16 +146,16 @@ class _DLogin_PageState extends State<Doctor_login> {
                         });
 
                         try{
-                          // final user=await _auth.signInWithEmailAndPassword(email: email, password: password);
-                          // if(user!=null ) {
-                          //   await getDonor(email);
-                          //   if(donerProfile.length==1){
+                          final user=await _auth.signInWithEmailAndPassword(email: email, password: password);
+                          if(user!=null ) {
+                            await getDoctor(email);
+                            if(doctorProfile.length==1){
                               Navigator.pushNamed(context, '/d_home');
-                            // }
-                            // else{
-                            //   throw Exception("Login Failed");
-                            // }
-                          // }
+                            }
+                            else{
+                              throw Exception("Login Failed");
+                            }
+                          }
                         }
                         catch (error) {
                           print(error);
@@ -189,7 +191,7 @@ class _DLogin_PageState extends State<Doctor_login> {
                     Center(
                       child:ElevatedButton(onPressed: () async{
 
-                        Navigator.pushNamed(context, '/p_registration');
+                        Navigator.pushNamed(context, '/d_registration');
                       },
                         style: ElevatedButton.styleFrom(
                           primary: textBoxBG,
